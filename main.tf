@@ -20,3 +20,15 @@ resource "aws_iam_group_membership" "employee_group_membership" {
     users = each.value
     depends_on = [ aws_iam_group.employee_group, aws_iam_user.employee_user ]
 }
+
+resource "aws_iam_policy" "s3_read_only" {
+    name   = "s3-read-only"
+    policy = data.aws_iam_policy_document.s3_read_only.json
+}
+
+resource "aws_iam_group_policy_attachment" "employee_group_policy_attachment" {
+    for_each = aws_iam_group.employee_group
+    
+    group = each.value.name
+    policy_arn = aws_iam_policy.s3_read_only.arn
+}
